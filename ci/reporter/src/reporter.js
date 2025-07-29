@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../../../.env' });
+require('dotenv').config({ path: '../../.env' });
 
 const fs = require('fs');
 const path = require('path');
@@ -8,6 +8,22 @@ const { getPackedSettings } = require('http2');
 const GAS_REPORT_FILE_PATH = path.resolve(__dirname, '../../../contracts/gasReporterOutput.json');
 const API_URL = process.env.API_URL || 'http://localhost:3000';
 const API_GAS_REPORT_ENDPOINT = `${API_URL}/api/gas-report`;
+
+async function fetchEthPrice() {
+    try {
+        const res = await axios.get(
+            'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest',
+            {
+                params: { symbol: 'ETH', convert: 'USD' },
+                headers: { 'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY },
+            }
+        );
+        return res.data.data.ETH.quote.USD.price;
+    } catch (error) {
+        console.error(`[CI Reporter] Error fetching ETH price: ${error.message}`);
+        return null;
+    }
+}
 
 async function sendGasReport () {
     console.log(`[CI Reporter] Starting to send gas report...`);
@@ -35,23 +51,32 @@ async function sendGasReport () {
     }
 
     const recordsToSend = [];
+    methodsData = gasReport.data.methods;
+    const ethPrice = await fetchEthPrice();
+    console.log(ethPrice);
+    const GAS_PRICE_WEI = 20 * 1e9;
 
-    for (contractName in gasReport) {
+    for (contractName in methodsData) {
         // checks if 
-        if (Object.prototype.hasOwnProperty.call(gasReport, contractName)) {
-            const contractMethods = gasReport[contractName];
-            for (const methodName in contractMethods) {
-                if (Object.prototype.hasOwnProperty.call(contractMethods, methodName)) {
-                    const methodData = contractMethods[methodName];
-                    recordsToSend.push({
-                        contractName: contractName,
-                        method: methodName,
-                        gasUsed: methodData.gasUsed,
-                        costUsd: methodData.usdCost,
-                        timestamp: new Date().toISOString(),
-                    });
-                }
+        if (Object.prototype.hasOwnProperty.call(methodsData, contractName)) {
+            const contractMethods = methodsData[contractName];
+
+            if (!contractMethods.executionGasAverage || contractMethods.numberOfCalls === 0) {
+                console.warn(`[CI Reporter] Skipping ${contractMethods.contract}.${contractMethods.method} (no gas data)`);
+                continue;
             }
+            
+            const gasUsed = contractMethods.executionGasAverage;
+            const costUsd = ethPrice ? (gasUsed * GAS_PRICE_WEI * ethPrice) / 1e18 : null;
+
+            recordsToSend.push({
+                contractName: contractMethods.contract,
+                method: contractMethods.method,
+                gasUsed: contractMethods.executionGasAverage,
+                costUsd: costUsd ? parseFloat(costUsd.toFixed(6)) : null,
+                timestamp: new Date().toISOString(),
+            });
+            
         }
     }
 
