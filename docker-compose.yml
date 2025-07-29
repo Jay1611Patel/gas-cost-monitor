@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6
+    container_name: gas-cost-monitor-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: gas_costs
+    volumes:
+      - mongodb_data:/data/db
+    restart: always
+    # networks:
+    #   - gas-cost-monitor-network
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gas-cost-monitor-api
+    ports:
+      - "3000:3000"
+    environment:
+      MONGO_URI: mongodb://admin:password@mongodb:27017/gas_costs?authSource=admin
+      API_PORT: 3000
+      COINMARKET_CAP_API_KEY: ${COINMARKETCAP_API_KEY}
+    depends_on:
+      - mongodb
+    restart: always
+    # networks:
+    #   - gas-cost-monitor-network
+volumes:
+  mongodb_data:
+
+  # networks:
+  #
