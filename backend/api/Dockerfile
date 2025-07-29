@@ -11,7 +11,7 @@ COPY package.json yarn.lock ./
 RUN yarn install --production --frozen-lockfile
 
 # Copy the rest of the application code
-COPY ..
+COPY . .
 
 # Expose the API port
 EXPOSE 3000
