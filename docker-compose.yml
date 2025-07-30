@@ -17,7 +17,7 @@ services:
     #   - gas-cost-monitor-network
   api:
     build:
-      context: .
+      context: ./backend/api
       dockerfile: Dockerfile
     container_name: gas-cost-monitor-api
     ports:

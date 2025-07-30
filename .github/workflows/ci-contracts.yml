@@ -1,0 +1,53 @@
+
+name: Contracts CI Gas Report
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'contracts/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'contracts/**'
+  
+jobs:
+  gas-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Yarn
+        run: npm install -g yarn
+
+      - name: Install Contracts Dependencies
+        run: yarn install
+        working-directory: contracts
+      
+      - name: Run Hardhat Tests and Generate Gas Report
+        run: yarn hardhat test 
+        working-directory: contracts
+        env:
+          COINMARKETCAP_API_KEY: ${{ secrets.COINMARKETCAP_API_KEY }}
+      
+      - name: Install CI Reporter Dependencies
+        run: yarn install
+        working-directory: ci/reporter
+      
+      - name: Send Gas Report to API
+        run: yarn start
+        working-directory: ci/reporter
+        env:
+          API_URL: ${{ secrets.API_URL }}
+

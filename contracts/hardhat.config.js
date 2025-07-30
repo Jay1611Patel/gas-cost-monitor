@@ -19,6 +19,7 @@ module.exports = {
     currency: "USD", // Report costs in USD
     outputFile: "./gas-report.json", // Path relative to contracts/
     coinmarketcap: process.env.COINMARKETCAP_API_KEY, // Needs API key for USD conversion
+    outputJSON: true,
     token: "ETH", // Specify the token for price fetching (e.g., ETH, BNB, MATIC)
     gasPriceApi:
       "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice", // Or another provider
