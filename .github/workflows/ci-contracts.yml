@@ -50,4 +50,5 @@ jobs:
         working-directory: ci/reporter
         env:
           API_URL: ${{ secrets.API_URL }}
+          COINMARKETCAP_API_KEY: ${{ secrets.COINMARKETCAP_API_KEY }}
 

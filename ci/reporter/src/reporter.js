@@ -3,7 +3,6 @@ require('dotenv').config({ path: '../../.env' });
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
-const { getPackedSettings } = require('http2');
 
 const GAS_REPORT_FILE_PATH = path.resolve(__dirname, '../../../contracts/gasReporterOutput.json');
 const API_URL = process.env.API_URL || 'http://localhost:3000';
