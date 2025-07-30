@@ -25,6 +25,7 @@ async function fetchEthPrice() {
 }
 
 async function sendGasReport () {
+    console.log(process.env.COINMARKETCAP_API_KEY?.length);
     console.log(`[CI Reporter] Starting to send gas report...`);
 
     if (!fs.existsSync(GAS_REPORT_FILE_PATH)) {
