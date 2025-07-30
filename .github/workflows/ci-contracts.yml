@@ -45,12 +45,6 @@ jobs:
         run: yarn install
         working-directory: ci/reporter
       
-      - name: Debug Env
-        run: |
-          echo "Key length: ${#COINMARKETCAP_API_KEY}"
-        env:
-          COINMARKETCAP_API_KEY: ${{ secrets.COINMARKETCAP_API_KEY }}
-      
       - name: Send Gas Report to API
         run: yarn start
         working-directory: ci/reporter
