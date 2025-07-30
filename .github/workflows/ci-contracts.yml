@@ -62,4 +62,3 @@ jobs:
           fi
         env:
           COINMARKETCAP_API_KEY: ${{ secrets.COINMARKETCAP_API_KEY }}
-
