@@ -25,7 +25,7 @@ async function fetchEthPrice() {
 }
 
 async function sendGasReport () {
-    console.log("CMC API Key Length:", process.env.COINMARKETCAP_API_KEY?.length || "NOT SET");
+    console.log("CMC API Key Length:", process.env.API_URL?.length || "NOT SET");
     console.log(`[CI Reporter] Starting to send gas report...`);
 
     if (!fs.existsSync(GAS_REPORT_FILE_PATH)) {
