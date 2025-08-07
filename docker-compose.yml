@@ -1,6 +1,18 @@
 version: '3.8'
 
+networks:
+  gas-net:
+    driver: bridge
+
 services:
+  hardhat-tester:
+    build:
+      context: ./contracts
+    volumes:
+      - shared-data:/usr/app/contracts
+    networks:
+      - gas-net
+
   mongodb:
     image: mongo:6
     container_name: gas-cost-monitor-mongodb
@@ -13,8 +25,9 @@ services:
     volumes:
       - mongodb_data:/data/db
     restart: always
-    # networks:
-    #   - gas-cost-monitor-network
+    networks:
+      - gas-net
+
   api:
     build:
       context: ./backend/api
@@ -29,10 +42,74 @@ services:
     depends_on:
       - mongodb
     restart: always
-    # networks:
-    #   - gas-cost-monitor-network
+    networks:
+      - gas-net
+
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - gas-net
+
+  kafka:
+    image: 'bitnami/kafka:3.6'
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_CFG_BROKER_ID: 1
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      ALLOW_PLAINTEXT_LISTENER: 'yes'
+      KAFKA_CFG_DELETE_TOPIC_ENABLE: "true"
+    depends_on:
+      - zookeeper
+    networks:
+      - gas-net
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  consumer:
+    build:
+      context: ./backend/consumer
+      dockerfile: Dockerfile
+    container_name: gas-report-consumer
+    environment:
+      API_URL: 'http://api:3000'
+      KAFKA_BROKERS: 'kafka:9092'
+    depends_on:
+      kafka:
+        condition: service_healthy
+      api:
+        condition: service_started
+    networks:
+      - gas-net
+
+  reporter:
+    build:
+      context: ./ci/reporter
+      dockerfile: Dockerfile
+    container_name: gas-reporter-script
+    environment:
+      KAFKA_BROKERS: 'kafka:9092'
+      TENANT_ID: 'default-tenant'
+    depends_on:
+      - kafka
+      - hardhat-tester
+    volumes:
+      - shared-data:/usr/app/contracts
+    networks:
+      - gas-net
+
 volumes:
   mongodb_data:
-
-  # networks:
-  #
+  shared-data:

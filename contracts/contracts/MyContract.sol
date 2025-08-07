@@ -6,12 +6,15 @@ contract MyContract {
     address[] public addressArray;
     mapping(uint256 => uint256) public myMapping;
 
+    event ValueUpdated(uint256 newValue, address sender);
+
     constructor(uint256 _initialValue) {
         myUintValue = _initialValue;
     }
 
     function setUintValue(uint256 _newValue) public {
         myUintValue = _newValue;
+        emit ValueUpdated(myUintValue, msg.sender);
     }
 
     function addAddressToArray(address _newAddress) public {

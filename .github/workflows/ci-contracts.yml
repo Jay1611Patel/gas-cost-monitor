@@ -48,13 +48,4 @@ jobs:
           API_URL: ${{ secrets.API_URL }}
           COINMARKETCAP_API_KEY: ${{ secrets.COINMARKETCAP_API_KEY }}
       
-      - name: Debug Secrets
-        run: |
-          echo "Secret length: ${#COINMARKETCAP_API_KEY}"
-          if [ -z "$COINMARKETCAP_API_KEY" ]; then
-            echo "Secret is NOT set!"
-          else
-            echo "Secret is present."
-          fi
-        env:
-          COINMARKETCAP_API_KEY: ${{ secrets.COINMARKETCAP_API_KEY }}
+

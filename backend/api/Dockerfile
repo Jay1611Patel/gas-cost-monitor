@@ -1,21 +1,17 @@
+# Use an official Node.js runtime as a parent image
+FROM node:18-alpine
 
-FROM node:20-alpine
+# Set working directory
+WORKDIR /usr/app
 
-# Set the working directory
-WORKDIR /usr/src/app
-
-# Copy package.json and yarn.lock to install dependencies first
+# Copy package.json and yarn.lock from backend/api
 COPY package.json yarn.lock ./
 
 # Install dependencies
-RUN yarn install --production --frozen-lockfile
+RUN yarn install --frozen-lockfile
 
 # Copy the rest of the application code
 COPY . .
 
-
-# Expose the API port
-EXPOSE 3000
-
-# Command to run the application
+# Default command (API entrypoint, not reporter.js)
 CMD ["node", "src/app.js"]

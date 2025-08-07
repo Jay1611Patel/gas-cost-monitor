@@ -16,6 +16,11 @@ mongoose.connect(MONGO_URI)
 
 // --- GasReport Schema---
 const gasReportSchema = new mongoose.Schema({
+  tenantId: { 
+    type: String,
+    required: true,
+    index: true
+  },
   contractName: {
     type: String,
     required: true
@@ -29,14 +34,13 @@ const gasReportSchema = new mongoose.Schema({
     required: true
   },
   costUsd: {
-    type: Number, // Can be null if CoinMarketCap API fails or is not configured
+    type: Number,
     default: null
   },
   timestamp: {
     type: Date,
     default: Date.now
   },
-  // more fields later, like 'network', 'txHash', 'blockNumber', 'commitHash', etc.
 });
 
 const GasReport = mongoose.model('GasReport', gasReportSchema);

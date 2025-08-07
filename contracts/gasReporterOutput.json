@@ -27,8 +27,11 @@
   "showMethodSig": false,
   "showUncalledMethods": false,
   "outputFile": "./gas-report.json",
+  "coinmarketcap": "[REDACTED]",
   "token": "ETH",
   "gasPriceApi": "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice",
+  "tokenPrice": "3829.00",
+  "gasPrice": 0,
   "blockGasLimit": 30000000,
   "solcInfo": {
    "version": "0.8.20",
@@ -266,14 +269,14 @@
      0
     ],
     "gasData": [
-     26692,
-     26692
+     28390,
+     28390
     ],
     "numberOfCalls": 2,
-    "executionGasAverage": 26692,
+    "executionGasAverage": 28390,
     "calldataGasAverage": 0,
-    "min": 26692,
-    "max": 26692
+    "min": 28390,
+    "max": 28390
    },
    "MyContract_1b64400e": {
     "key": "1b64400e",
@@ -307,24 +310,24 @@
    {
     "name": "MyContract",
     "gasData": [
-     927348,
-     927348,
-     927348,
-     927348,
-     927348,
-     927348,
-     927348,
-     927348,
-     927348,
-     927348,
-     927348,
-     927348,
-     927348,
-     927348,
-     927348,
-     927348,
-     927348,
-     927348
+     948925,
+     948925,
+     948925,
+     948925,
+     948925,
+     948925,
+     948925,
+     948925,
+     948925,
+     948925,
+     948925,
+     948925,
+     948925,
+     948925,
+     948925,
+     948925,
+     948925,
+     948925
     ],
     "callData": [
      0,
@@ -346,11 +349,11 @@
      0,
      0
     ],
-    "executionGasAverage": 927348,
+    "executionGasAverage": 948925,
     "calldataGasAverage": 0,
-    "min": 927348,
-    "max": 927348,
-    "percent": 3.1
+    "min": 948925,
+    "max": 948925,
+    "percent": 3.2
    }
   ]
  }
