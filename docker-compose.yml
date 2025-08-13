@@ -39,6 +39,7 @@ services:
       MONGO_URI: mongodb://admin:password@mongodb:27017/gas_costs?authSource=admin
       API_PORT: 3000
       COINMARKET_CAP_API_KEY: ${COINMARKETCAP_API_KEY}
+      SESSION_SECRET: ${SESSION_SECRET}
     depends_on:
       - mongodb
     restart: always
@@ -64,7 +65,7 @@ services:
       KAFKA_CFG_BROKER_ID: 1
       KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
-      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       ALLOW_PLAINTEXT_LISTENER: 'yes'
       KAFKA_CFG_DELETE_TOPIC_ENABLE: "true"
@@ -84,7 +85,7 @@ services:
       dockerfile: Dockerfile
     container_name: gas-report-consumer
     environment:
-      API_URL: 'http://api:3000'
+      API_URL: 'http://gas-cost-monitor-api:3000'
       KAFKA_BROKERS: 'kafka:9092'
     depends_on:
       kafka:
@@ -101,12 +102,26 @@ services:
     container_name: gas-reporter-script
     environment:
       KAFKA_BROKERS: 'kafka:9092'
-      TENANT_ID: 'default-tenant'
+      TENANT_ID: '0x78880282D9313244aadA44E7d4e12206a33A292c'
     depends_on:
-      - kafka
-      - hardhat-tester
+      kafka:
+        condition: service_healthy
+      hardhat-tester:
+        condition: service_started
     volumes:
       - shared-data:/usr/app/contracts
+    networks:
+      - gas-net
+  
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: gas-cost-monitor-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - api
     networks:
       - gas-net
 
