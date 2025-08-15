@@ -129,6 +129,9 @@ function DashboardScreen({ user }) {
         <p>Welcome, <span className="wallet-address">{user.walletAddress}</span></p>
       </header>
       <main>
+        <a href="/api/auth/github" className="github-button">
+            Connect to GitHub
+        </a>
         {loading && <div>Loading reports...</div>}
         {error && <div style={{ color: 'orange' }}>{error}</div>}
         {!loading && !error && (
